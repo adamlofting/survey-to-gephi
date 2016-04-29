@@ -1,0 +1,19 @@
+{
+  "name": "survey-to-gephi",
+  "version": "1.0.0",
+  "description": "ETL script to get survey data into a format for use in gephi",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adamlofting/survey-to-gephi.git"
+  },
+  "author": "Adam Lofting <contactme@adamlofting.com> (http://adamlofting.com/)",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/adamlofting/survey-to-gephi/issues"
+  },
+  "homepage": "https://github.com/adamlofting/survey-to-gephi#readme"
+}
