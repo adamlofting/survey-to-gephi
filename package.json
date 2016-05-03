@@ -15,5 +15,10 @@
   "bugs": {
     "url": "https://github.com/adamlofting/survey-to-gephi/issues"
   },
-  "homepage": "https://github.com/adamlofting/survey-to-gephi#readme"
+  "homepage": "https://github.com/adamlofting/survey-to-gephi#readme",
+  "dependencies": {
+    "async": "^1.5.2",
+    "csv": "^0.4.6",
+    "json2csv": "^3.3.0"
+  }
 }
