@@ -267,6 +267,13 @@ function addDimensionsToNode(node) {
           node['ExplainTheNetwork'] = dataset[j]['I could explain the change that the network is trying to bring about to a friend or colleague'];
           node['ExplainMozilla'] = dataset[j]['I could explain the change that Mozilla is trying to bring about to a friend or colleague'];
 
+          // MSL had slightly different language for the explain network / mozilla questions, so need to catch those
+          if (i === 0) {
+            // this is someone on the MSL survey
+            node['ExplainTheNetwork'] = dataset[j]['I can explain the change that the network is trying to bring about to a friend or colleague'];
+            node['ExplainMozilla'] = dataset[j]['I can explain the change that Mozilla is trying to bring about to a friend or colleague'];
+          }
+
         }
 
         node['IsStaff'] = checkIfIsStaff(node.Id);
@@ -358,6 +365,10 @@ function frequencyToWeight(value) {
  */
 function addToEdges(type, src, tgt, weight) {
   if (!src || !tgt) {
+    return;
+  }
+
+  if (weight === 0) {
     return;
   }
 
