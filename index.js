@@ -26,7 +26,7 @@ var edges_collab = [];
 var edges_resource = [];
 var edges_speak = [];
 var edges_combined = [];
-var edges_fields = ['Source', 'Target', 'Weight'];
+var edges_fields = ['Source', 'Target', 'Weight', 'Met'];
 var disambiguation = [];
 var staffnames = [];
 var junknames = [];
@@ -363,7 +363,7 @@ function frequencyToWeight(value) {
 /**
  * addToEdges
  */
-function addToEdges(type, src, tgt, weight) {
+function addToEdges(type, src, tgt, weight, met) {
   if (!src || !tgt) {
     return;
   }
@@ -376,7 +376,8 @@ function addToEdges(type, src, tgt, weight) {
     edges_collab.push({
       Source: src,
       Target: tgt,
-      Weight: weight
+      Weight: weight,
+      Met: met
     });
   }
 
@@ -384,7 +385,8 @@ function addToEdges(type, src, tgt, weight) {
     edges_resource.push({
       Source: src,
       Target: tgt,
-      Weight: weight
+      Weight: weight,
+      Met: met
     });
   }
 
@@ -392,7 +394,8 @@ function addToEdges(type, src, tgt, weight) {
     edges_speak.push({
       Source: src,
       Target: tgt,
-      Weight: weight
+      Weight: weight,
+      Met: met
     });
   }
 
@@ -400,7 +403,8 @@ function addToEdges(type, src, tgt, weight) {
     edges_combined.push({
       Source: src,
       Target: tgt,
-      Weight: weight
+      Weight: weight,
+      Met: met
     });
   }
 
@@ -427,75 +431,83 @@ function findEdgesInRow(row, callback) {
   var weightCollab;
   var weightAdvice;
   var weightSpeak;
+  var met;
 
   if (src && tgt1) {
     weightCollab = frequencyToWeight(row['Collaborate with?:person_1']);
     weightAdvice = frequencyToWeight(row['Go to for advice or resources?:person_1']);
     weightSpeak = frequencyToWeight(row['Speak with?:person_1']);
-    addToEdges('collab', src, tgt1, weightCollab);
-    addToEdges('resource', src, tgt1, weightAdvice);
-    addToEdges('speak', src, tgt1, weightSpeak);
-    addToEdges('combined', src, tgt1, weightCollab + weightAdvice + weightSpeak);
+    met = row['When did you first meet?:person_1'];
+    addToEdges('collab', src, tgt1, weightCollab, met);
+    addToEdges('resource', src, tgt1, weightAdvice, met);
+    addToEdges('speak', src, tgt1, weightSpeak, met);
+    addToEdges('combined', src, tgt1, weightCollab + weightAdvice + weightSpeak, met);
   }
 
   if (src && tgt2) {
     weightCollab = frequencyToWeight(row['Collaborate with?:person_2']);
     weightAdvice = frequencyToWeight(row['Go to for advice or resources?:person_2']);
     weightSpeak = frequencyToWeight(row['Speak with?:person_2']);
-    addToEdges('collab', src, tgt2, weightCollab);
-    addToEdges('resource', src, tgt2, weightAdvice);
-    addToEdges('speak', src, tgt2, weightSpeak);
-    addToEdges('combined', src, tgt2, weightCollab + weightAdvice + weightSpeak);
+    weightSpeak = frequencyToWeight(row['Speak with?:person_2']);
+    addToEdges('collab', src, tgt2, weightCollab, met);
+    addToEdges('resource', src, tgt2, weightAdvice, met);
+    addToEdges('speak', src, tgt2, weightSpeak, met);
+    addToEdges('combined', src, tgt2, weightCollab + weightAdvice + weightSpeak, met);
   }
 
   if (src && tgt3) {
     weightCollab = frequencyToWeight(row['Collaborate with?:person_3']);
     weightAdvice = frequencyToWeight(row['Go to for advice or resources?:person_3']);
     weightSpeak = frequencyToWeight(row['Speak with?:person_3']);
-    addToEdges('collab', src, tgt3, weightCollab);
-    addToEdges('resource', src, tgt3, weightAdvice);
-    addToEdges('speak', src, tgt3, weightSpeak);
-    addToEdges('combined', src, tgt3, weightCollab + weightAdvice + weightSpeak);
+    weightSpeak = frequencyToWeight(row['Speak with?:person_3']);
+    addToEdges('collab', src, tgt3, weightCollab, met);
+    addToEdges('resource', src, tgt3, weightAdvice, met);
+    addToEdges('speak', src, tgt3, weightSpeak, met);
+    addToEdges('combined', src, tgt3, weightCollab + weightAdvice + weightSpeak, met);
   }
 
   if (src && tgt4) {
     weightCollab = frequencyToWeight(row['Collaborate with?:person_4']);
     weightAdvice = frequencyToWeight(row['Go to for advice or resources?:person_4']);
     weightSpeak = frequencyToWeight(row['Speak with?:person_4']);
-    addToEdges('collab', src, tgt4, weightCollab);
-    addToEdges('resource', src, tgt4, weightAdvice);
-    addToEdges('speak', src, tgt4, weightSpeak);
-    addToEdges('combined', src, tgt4, weightCollab + weightAdvice + weightSpeak);
+    weightSpeak = frequencyToWeight(row['Speak with?:person_4']);
+    addToEdges('collab', src, tgt4, weightCollab, met);
+    addToEdges('resource', src, tgt4, weightAdvice, met);
+    addToEdges('speak', src, tgt4, weightSpeak, met);
+    addToEdges('combined', src, tgt4, weightCollab + weightAdvice + weightSpeak, met);
   }
 
   if (src && tgt5) {
     weightCollab = frequencyToWeight(row['Collaborate with?:person_5']);
     weightAdvice = frequencyToWeight(row['Go to for advice or resources?:person_5']);
     weightSpeak = frequencyToWeight(row['Speak with?:person_5']);
-    addToEdges('collab', src, tgt5, weightCollab);
-    addToEdges('resource', src, tgt5, weightAdvice);
-    addToEdges('speak', src, tgt5, weightSpeak);
-    addToEdges('combined', src, tgt5, weightCollab + weightAdvice + weightSpeak);
+    weightSpeak = frequencyToWeight(row['Speak with?:person_5']);
+    addToEdges('collab', src, tgt5, weightCollab, met);
+    addToEdges('resource', src, tgt5, weightAdvice, met);
+    addToEdges('speak', src, tgt5, weightSpeak, met);
+    addToEdges('combined', src, tgt5, weightCollab + weightAdvice + weightSpeak, met);
   }
 
   if (src && tgt6) {
     weightCollab = frequencyToWeight(row['Collaborate with?:person_6']);
     weightAdvice = frequencyToWeight(row['Go to for advice or resources?:person_6']);
     weightSpeak = frequencyToWeight(row['Speak with?:person_6']);
-    addToEdges('collab', src, tgt6, weightCollab);
-    addToEdges('resource', src, tgt6, weightAdvice);
-    addToEdges('speak', src, tgt6, weightSpeak);
-    addToEdges('combined', src, tgt6, weightCollab + weightAdvice + weightSpeak);
+    weightSpeak = frequencyToWeight(row['Speak with?:person_6']);
+    addToEdges('collab', src, tgt6, weightCollab, met);
+    addToEdges('resource', src, tgt6, weightAdvice, met);
+    addToEdges('speak', src, tgt6, weightSpeak, met);
+    addToEdges('combined', src, tgt6, weightCollab + weightAdvice + weightSpeak, met);
   }
 
   if (src && tgt7) {
     weightCollab = frequencyToWeight(row['Collaborate with?:person_7']);
     weightAdvice = frequencyToWeight(row['Go to for advice or resources?:person_7']);
     weightSpeak = frequencyToWeight(row['Speak with?:person_7']);
-    addToEdges('collab', src, tgt7, weightCollab);
-    addToEdges('resource', src, tgt7, weightAdvice);
-    addToEdges('speak', src, tgt7, weightSpeak);
-    addToEdges('combined', src, tgt7, weightCollab + weightAdvice + weightSpeak);
+    weightSpeak = frequencyToWeight(row['Speak with?:person_7']);
+    addToEdges('collab', src, tgt7, weightCollab, met);
+    addToEdges('resource', src, tgt7, weightAdvice, met);
+    addToEdges('speak', src, tgt7, weightSpeak, met);
+    addToEdges('combined', src, tgt7, weightCollab + weightAdvice + weightSpeak, met);
   }
 
   callback();
