@@ -20,7 +20,7 @@ var all_datasets = [];
 
 // data sets to build
 var nodes = [];
-var nodes_fields = ['Id', 'Label', 'AnsweredSurvey', 'InNetwork', 'IsStaff', 'InterestWebLit', 'InterestDigitalInclusion', 'InterestOnlinePrivacy', 'InterestWalledGardens', 'InterestPlatformHackability', 'InterestGlobalPublicResource', 'Country', 'TimeInNetwork', 'ExplainTheNetwork', 'ExplainMozilla'];
+var nodes_fields = ['Id', 'Label', 'AnsweredSurvey', 'InNetwork', 'IsStaff', 'InterestWebLit', 'InterestDigitalInclusion', 'InterestOnlinePrivacy', 'InterestWalledGardens', 'InterestPlatformHackability', 'InterestGlobalPublicResource', 'Country', 'TimeInNetwork', 'ExplainTheNetwork', 'ExplainMozilla', 'PartOfAnOrgInNetwork'];
 
 var edges_collab = [];
 var edges_resource = [];
@@ -171,7 +171,8 @@ function addToNodes(name) {
       Country: 'NoAnswer',
       TimeInNetwork: 'NoAnswer',
       ExplainTheNetwork: 'NoAnswer',
-      ExplainMozilla: 'NoAnswer'
+      ExplainMozilla: 'NoAnswer',
+      PartOfAnOrgInNetwork: 'NoAnswer'
     });
   }
 }
@@ -266,6 +267,8 @@ function addDimensionsToNode(node) {
           node['TimeInNetwork'] = dataset[j]['How long have you been part of the network?'];
           node['ExplainTheNetwork'] = dataset[j]['I could explain the change that the network is trying to bring about to a friend or colleague'];
           node['ExplainMozilla'] = dataset[j]['I could explain the change that Mozilla is trying to bring about to a friend or colleague'];
+          node['PartOfAnOrgInNetwork'] = dataset[j]['Are you part of an organization that is considered part of the network?'];
+
 
           // MSL had slightly different language for the explain network / mozilla questions, so need to catch those
           if (i === 0) {
