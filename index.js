@@ -20,7 +20,10 @@ var all_datasets = [];
 
 // data sets to build
 var nodes = [];
-var nodes_fields = ['Id', 'Label', 'AnsweredSurvey', 'InNetwork', 'IsStaff', 'InterestWebLit', 'InterestDigitalInclusion', 'InterestOnlinePrivacy', 'InterestWalledGardens', 'InterestPlatformHackability', 'InterestGlobalPublicResource', 'Country', 'TimeInNetwork', 'ExplainTheNetwork', 'ExplainMozilla', 'PartOfAnOrgInNetwork'];
+var nodes_fields = ['Id', 'Label', 'AnsweredSurvey', 'InNetwork', 'IsStaff', 'InterestWebLit', 'InterestDigitalInclusion', 'InterestOnlinePrivacy', 'InterestWalledGardens', 'InterestPlatformHackability', 'InterestGlobalPublicResource', 'Country', 'TimeInNetwork', 'ExplainTheNetwork', 'ExplainMozilla', 'PartOfAnOrgInNetwork', 'OrgSize'];
+
+var quickfire_answers = [];
+var quickfire_answers_fields = ['RespID', 'Survey', 'QuestionID', 'Value', 'Wording'];
 
 var edges_collab = [];
 var edges_resource = [];
@@ -172,7 +175,8 @@ function addToNodes(name) {
       TimeInNetwork: 'NoAnswer',
       ExplainTheNetwork: 'NoAnswer',
       ExplainMozilla: 'NoAnswer',
-      PartOfAnOrgInNetwork: 'NoAnswer'
+      PartOfAnOrgInNetwork: 'NoAnswer',
+      OrgSize: 1
     });
   }
 }
@@ -238,6 +242,47 @@ function checkIfAnsweredSurvey(row, nameToCheck) {
 }
 
 /**
+ * convertOrgSizeToInt
+ */
+function convertOrgSizeToInt(value) {
+  if (!value) {
+    return 1;
+  }
+
+  if (value === "") {
+    return 1;
+  }
+
+  if (value === "10,000+") {
+    return 10000;
+  }
+
+  if (value === "100-499") {
+    return 300;
+  }
+
+  if (value === "20-99") {
+    return 60;
+  }
+
+  if (value === "10-19") {
+    return 15;
+  }
+
+  if (value === "5-9") {
+    return 7;
+  }
+
+  if (value === "1-4") {
+    return 3;
+  }
+
+  return 1;
+}
+
+
+
+/**
  * addDimensionsToNode
  */
 function addDimensionsToNode(node) {
@@ -268,6 +313,7 @@ function addDimensionsToNode(node) {
           node['ExplainTheNetwork'] = dataset[j]['I could explain the change that the network is trying to bring about to a friend or colleague'];
           node['ExplainMozilla'] = dataset[j]['I could explain the change that Mozilla is trying to bring about to a friend or colleague'];
           node['PartOfAnOrgInNetwork'] = dataset[j]['Are you part of an organization that is considered part of the network?'];
+          node['OrgSize'] = convertOrgSizeToInt(dataset[j]['Organization Size']);
 
 
           // MSL had slightly different language for the explain network / mozilla questions, so need to catch those
@@ -304,6 +350,150 @@ function addDimensionsToNode(node) {
             // this appeared in Clubs data
             if (node['InNetwork'] !== 'Clubs') { node['InNetwork'] = 'Multiple'; }
           }
+        }
+
+        // reshape the data for the quick-fire questions for use in Tableau
+        if (node['AnsweredSurvey'] === true) {
+          var current_survey;
+          if (i === 0) {
+            current_survey = 'MSL';
+          } else if (i === 1) {
+            current_survey = 'Hive NYC';
+          } else {
+            current_survey = 'Clubs';
+          }
+
+          var csv_title_1 = 'Your feeling:Being a part of the network allows me to achieve more, compared to what I could do without the network.:Quick fire questions';
+          var val_1 = dataset[j][csv_title_1];
+          var ans_1 = {
+            RespID: node.Id + current_survey,
+            Survey: current_survey,
+            QuestionID: 'Q_1',
+            Value: val_1,
+            Wording: csv_title_1.substring(13).substring(0, csv_title_1.length - 34)
+          };
+          if (val_1) {
+            quickfire_answers.push(ans_1);
+          }
+
+          var csv_title_2 = 'Your feeling:Members of the network share a common purpose.:Quick fire questions';
+          var val_2 = dataset[j][csv_title_2];
+          var ans_2 = {
+            RespID: node.Id + current_survey,
+            Survey: current_survey,
+            QuestionID: 'Q_2',
+            Value: val_2,
+            Wording: csv_title_2.substring(13).substring(0, csv_title_2.length - 34)
+          };
+          if (val_2) {
+            quickfire_answers.push(ans_2);
+          }
+
+          var csv_title_3 = 'Your feeling:Members of the network are creating new knowledge or insights together.:Quick fire questions';
+          var val_3 = dataset[j][csv_title_3];
+          var ans_3 = {
+            RespID: node.Id + current_survey,
+            Survey: current_survey,
+            QuestionID: 'Q_3',
+            Value: val_3,
+            Wording: csv_title_3.substring(13).substring(0, csv_title_3.length - 34)
+          };
+          if (val_3) {
+            quickfire_answers.push(ans_3);
+          }
+
+          var csv_title_4 = 'Your feeling:I have a stake and voice in the direction that the network takes.:Quick fire questions';
+          var val_4 = dataset[j][csv_title_4];
+          var ans_4 = {
+            RespID: node.Id + current_survey,
+            Survey: current_survey,
+            QuestionID: 'Q_4',
+            Value: val_4,
+            Wording: csv_title_4.substring(13).substring(0, csv_title_4.length - 34)
+          };
+          if (val_4) {
+            quickfire_answers.push(ans_4);
+          }
+
+          var csv_title_5 = 'Your feeling:The network’s internal communications systems are serving it well (e.g. mailing lists, meet-ups, community calls and other channels).:Quick fire questions';
+          var val_5 = dataset[j][csv_title_5];
+          var ans_5 = {
+            RespID: node.Id + current_survey,
+            Survey: current_survey,
+            QuestionID: 'Q_5',
+            Value: val_5,
+            Wording: csv_title_5.substring(13).substring(0, csv_title_5.length - 34)
+          };
+          if (val_5) {
+            quickfire_answers.push(ans_5);
+          }
+
+          var csv_title_6 = 'Your feeling:I learn from the practices and ideas of other members of the network.:Quick fire questions';
+          var val_6 = dataset[j][csv_title_6];
+          var ans_6 = {
+            RespID: node.Id + current_survey,
+            Survey: current_survey,
+            QuestionID: 'Q_6',
+            Value: val_6,
+            Wording: csv_title_6.substring(13).substring(0, csv_title_6.length - 34)
+          };
+          if (val_6) {
+            quickfire_answers.push(ans_6);
+          }
+
+          var csv_title_7 = 'Your feeling:I feel like the network is meeting its strategic objectives and goals.:Quick fire questions';
+          var val_7 = dataset[j][csv_title_7];
+          var ans_7 = {
+            RespID: node.Id + current_survey,
+            Survey: current_survey,
+            QuestionID: 'Q_7',
+            Value: val_7,
+            Wording: csv_title_7.substring(13).substring(0, csv_title_7.length - 34)
+          };
+          if (val_7) {
+            quickfire_answers.push(ans_7);
+          }
+
+          var csv_title_8 = 'Your feeling:The network feels like a robust and healthy community.:Quick fire questions';
+          var val_8 = dataset[j][csv_title_8];
+          var ans_8 = {
+            RespID: node.Id + current_survey,
+            Survey: current_survey,
+            QuestionID: 'Q_8',
+            Value: val_8,
+            Wording: csv_title_8.substring(13).substring(0, csv_title_8.length - 34)
+          };
+          if (val_8) {
+            quickfire_answers.push(ans_8);
+          }
+
+          var csv_title_9 = 'Your feeling:I feel like the network team (e.g. Mozilla staff) has been responsive to any conflicts, tensions and challenges that I have experienced or perceived in the network.:Quick fire questions';
+          var val_9 = dataset[j][csv_title_9];
+          var ans_9 = {
+            RespID: node.Id + current_survey,
+            Survey: current_survey,
+            QuestionID: 'Q_9',
+            Value: val_9,
+            Wording: csv_title_9.substring(13).substring(0, csv_title_9.length - 34)
+          };
+          if (val_9) {
+            quickfire_answers.push(ans_9);
+          }
+
+          var csv_title_10 = 'Your feeling:The network is open and welcoming for new people to join.:Quick fire questions';
+          var val_10 = dataset[j][csv_title_10];
+          var ans_10 = {
+            RespID: node.Id + current_survey,
+            Survey: current_survey,
+            QuestionID: 'Q_10',
+            Value: val_10,
+            Wording: csv_title_10.substring(13).substring(0, csv_title_10.length - 34)
+          };
+          if (val_10) {
+            quickfire_answers.push(ans_10);
+          }
+
+
         }
 
         //TODO
@@ -606,6 +796,17 @@ async.series({
         fs.writeFile('export/edges_combined.csv', csv, function(err) {
           if (err) throw err;
           console.log('edges combined file saved');
+          callback(null);
+        });
+      });
+  },
+  writeQuickFireQs: function(callback){
+      // write out the combined edges data
+      json2csv({ data: quickfire_answers, fields: quickfire_answers_fields }, function(err, csv) {
+        if (err) console.log(err);
+        fs.writeFile('export/quickfire_answers.csv', csv, function(err) {
+          if (err) throw err;
+          console.log('quickfire combined file saved');
           callback(null);
         });
       });
