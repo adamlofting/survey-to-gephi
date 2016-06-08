@@ -25,6 +25,23 @@ var nodes_fields = ['Id', 'Label', 'AnsweredSurvey', 'InNetwork', 'IsStaff', 'In
 var quickfire_answers = [];
 var quickfire_answers_fields = ['RespID', 'Survey', 'QuestionID', 'Value', 'Wording'];
 
+var network_strength = [];
+var network_strength_fields = [
+  'id',
+  'score',
+  'alignmentCombined',
+  'alignmentNetwork',
+  'alignmentMozilla',
+  'connectionScoreCombined',
+  'connectionScore1',
+  'connectionScore2',
+  'connectionScore3',
+  'connectionScore4',
+  'connectionScore5',
+  'connectionScore6',
+  'connectionScore7'
+  ];
+
 var edges_collab = [];
 var edges_resource = [];
 var edges_speak = [];
@@ -280,6 +297,41 @@ function convertOrgSizeToInt(value) {
   return 1;
 }
 
+/**
+ * convertLikertToScore
+ */
+function convertLikertToScore(value) {
+  if (!value) {
+    return 0;
+  }
+
+  if (value === "") {
+    return 0;
+  }
+
+  if (value === "Strongly disagree") {
+    return 1;
+  }
+
+  if (value === "Disagree") {
+    return 2;
+  }
+
+  if (value === "Neutral") {
+    return 3;
+  }
+
+  if (value === "Agree") {
+    return 4;
+  }
+
+  if (value === "Strongly agree") {
+    return 5;
+  }
+
+  return 0;
+}
+
 
 
 /**
@@ -352,16 +404,17 @@ function addDimensionsToNode(node) {
           }
         }
 
+        var current_survey;
+        if (i === 0) {
+          current_survey = 'MSL';
+        } else if (i === 1) {
+          current_survey = 'Hive NYC';
+        } else {
+          current_survey = 'Clubs';
+        }
+
         // reshape the data for the quick-fire questions for use in Tableau
         if (node['AnsweredSurvey'] === true) {
-          var current_survey;
-          if (i === 0) {
-            current_survey = 'MSL';
-          } else if (i === 1) {
-            current_survey = 'Hive NYC';
-          } else {
-            current_survey = 'Clubs';
-          }
 
           var csv_title_1 = 'Your feeling:Being a part of the network allows me to achieve more, compared to what I could do without the network.:Quick fire questions';
           var val_1 = dataset[j][csv_title_1];
@@ -493,12 +546,85 @@ function addDimensionsToNode(node) {
             quickfire_answers.push(ans_10);
           }
 
-
         }
 
-        //TODO
-        // if this node already been set, check if this is different
-        // if it is different set this to be a node in multiple networks
+        // save the data needed for network strength calcuation
+        if (node['AnsweredSurvey'] === true) {
+          var responseID = dataset[j]['Response ID'];
+
+          var alignmentNetwork = convertLikertToScore(node['ExplainTheNetwork']);
+          var alignmentMozilla = convertLikertToScore(node['ExplainMozilla']);
+          var alignmentCombined = alignmentNetwork + alignmentMozilla;
+
+          var weightCollab;
+          var weightAdvice;
+          var weightSpeak;
+          var weightCombined;
+
+          weightCollab = frequencyToWeight(dataset[j]['Collaborate with?:person_1']);
+          weightAdvice = frequencyToWeight(dataset[j]['Go to for advice or resources?:person_1']);
+          weightSpeak = frequencyToWeight(dataset[j]['Speak with?:person_1']);
+          weightCombined = weightCollab + weightAdvice + weightSpeak;
+          var connectionScore1 = weightCombined;
+
+
+          weightCollab = frequencyToWeight(dataset[j]['Collaborate with?:person_2']);
+          weightAdvice = frequencyToWeight(dataset[j]['Go to for advice or resources?:person_2']);
+          weightSpeak = frequencyToWeight(dataset[j]['Speak with?:person_2']);
+          weightCombined = weightCollab + weightAdvice + weightSpeak;
+          var connectionScore2 = weightCombined;
+
+          weightCollab = frequencyToWeight(dataset[j]['Collaborate with?:person_3']);
+          weightAdvice = frequencyToWeight(dataset[j]['Go to for advice or resources?:person_3']);
+          weightSpeak = frequencyToWeight(dataset[j]['Speak with?:person_3']);
+          weightCombined = weightCollab + weightAdvice + weightSpeak;
+          var connectionScore3 = weightCombined;
+
+          weightCollab = frequencyToWeight(dataset[j]['Collaborate with?:person_4']);
+          weightAdvice = frequencyToWeight(dataset[j]['Go to for advice or resources?:person_4']);
+          weightSpeak = frequencyToWeight(dataset[j]['Speak with?:person_4']);
+          weightCombined = weightCollab + weightAdvice + weightSpeak;
+          var connectionScore4 = weightCombined;
+
+          weightCollab = frequencyToWeight(dataset[j]['Collaborate with?:person_5']);
+          weightAdvice = frequencyToWeight(dataset[j]['Go to for advice or resources?:person_5']);
+          weightSpeak = frequencyToWeight(dataset[j]['Speak with?:person_5']);
+          weightCombined = weightCollab + weightAdvice + weightSpeak;
+          var connectionScore5 = weightCombined;
+
+          weightCollab = frequencyToWeight(dataset[j]['Collaborate with?:person_6']);
+          weightAdvice = frequencyToWeight(dataset[j]['Go to for advice or resources?:person_6']);
+          weightSpeak = frequencyToWeight(dataset[j]['Speak with?:person_6']);
+          weightCombined = weightCollab + weightAdvice + weightSpeak;
+          var connectionScore6 = weightCombined;
+
+          weightCollab = frequencyToWeight(dataset[j]['Collaborate with?:person_7']);
+          weightAdvice = frequencyToWeight(dataset[j]['Go to for advice or resources?:person_7']);
+          weightSpeak = frequencyToWeight(dataset[j]['Speak with?:person_7']);
+          weightCombined = weightCollab + weightAdvice + weightSpeak;
+          var connectionScore7 = weightCombined;
+
+          var connectionScoreCombined = connectionScore1 + connectionScore2 + connectionScore3 + connectionScore4 + connectionScore5 + connectionScore6 + connectionScore7;
+
+          var score = connectionScoreCombined * alignmentCombined;
+
+          var row = {
+            id: current_survey + responseID,
+            score:  score,
+            alignmentCombined: alignmentCombined,
+            alignmentNetwork: alignmentNetwork,
+            alignmentMozilla: alignmentMozilla,
+            connectionScoreCombined: connectionScoreCombined,
+            connectionScore1: connectionScore1,
+            connectionScore2: connectionScore2,
+            connectionScore3: connectionScore3,
+            connectionScore4: connectionScore4,
+            connectionScore5: connectionScore5,
+            connectionScore6: connectionScore6,
+            connectionScore7: connectionScore7
+          };
+          network_strength.push(row);
+        }
 
       }
     }
@@ -807,6 +933,17 @@ async.series({
         fs.writeFile('export/quickfire_answers.csv', csv, function(err) {
           if (err) throw err;
           console.log('quickfire combined file saved');
+          callback(null);
+        });
+      });
+  },
+  writeNetworkStrength: function(callback){
+      // write out the combined edges data
+      json2csv({ data: network_strength, fields: network_strength_fields }, function(err, csv) {
+        if (err) console.log(err);
+        fs.writeFile('export/network_strength.csv', csv, function(err) {
+          if (err) throw err;
+          console.log('network_strength file saved');
           callback(null);
         });
       });
